@@ -4,7 +4,7 @@ import { DetectorControlService } from '../../services/detector-control.service'
 import { ActivatedRoute, UrlSegment } from '@angular/router';
 import { DetectorResponse, RenderingType } from '../../models/detector';
 import { BehaviorSubject } from 'rxjs';
-import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
+//import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
 
 @Component({
   selector: 'detector-container',
@@ -31,10 +31,10 @@ export class DetectorContainerComponent implements OnInit {
   isCategoryOverview:boolean = false;
   private isLegacy:boolean
   constructor(private _route: ActivatedRoute, private _diagnosticService: DiagnosticService,
-    public detectorControlService: DetectorControlService,private versionTestService:VersionTestService) { }
+    public detectorControlService: DetectorControlService) { }
 
   ngOnInit() {
-    this.isLegacy = this.versionTestService.getIsLegcy();
+    this.isLegacy = true;//this.versionTestService.getIsLegcy();
     //Remove after A/B Test
     if (this.isLegacy) {
       this.hideTimerPicker = false;
@@ -71,7 +71,7 @@ export class DetectorContainerComponent implements OnInit {
     this._diagnosticService.getDetector(this.detectorName, this.detectorControlService.startTimeString, this.detectorControlService.endTimeString,
       this.detectorControlService.shouldRefresh,  this.detectorControlService.isInternalView)
       .subscribe((response: DetectorResponse) => {
-        this.shouldHideTimePicker(response);
+       // this.shouldHideTimePicker(response);
         this.detectorResponse = response;
       }, (error: any) => {
         this.error = error;
@@ -79,17 +79,17 @@ export class DetectorContainerComponent implements OnInit {
   }
 
   // TODO: Right now this is hardcoded to hide for cards, but make this configurable from backend
-  shouldHideTimePicker(response: DetectorResponse) {
-    if (response && response.dataset && response.dataset.length > 0) {
-      const cardRenderingIndex = response.dataset.findIndex(data => data.renderingProperties.type == RenderingType.Cards);
+  // shouldHideTimePicker(response: DetectorResponse) {
+  //   if (response && response.dataset && response.dataset.length > 0) {
+  //     const cardRenderingIndex = response.dataset.findIndex(data => data.renderingProperties.type == RenderingType.Cards);
 
-      //Remove after A/B Test
-      if (this.isLegacy) {
-        this.hideDetectorControl = cardRenderingIndex >= 0;
-      } else {
-        this.hideDetectorControl = cardRenderingIndex >= 0 || this.hideDetectorControl;
-      }
+  //     //Remove after A/B Test
+  //     if (this.isLegacy) {
+  //       this.hideDetectorControl = cardRenderingIndex >= 0;
+  //     } else {
+  //       this.hideDetectorControl = cardRenderingIndex >= 0 || this.hideDetectorControl;
+  //     }
       
-    }
-  }
+  //   }
+  // }
 }

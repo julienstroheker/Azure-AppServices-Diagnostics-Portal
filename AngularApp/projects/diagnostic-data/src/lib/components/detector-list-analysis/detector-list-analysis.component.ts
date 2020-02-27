@@ -93,14 +93,14 @@ export class DetectorListAnalysisComponent extends DataRenderBaseComponent imple
         private _supportTopicService: GenericSupportTopicService, protected _globals: GenieGlobals,
         @Inject(DIAGNOSTIC_DATA_CONFIG) config: DiagnosticDataConfig) {
         super(telemetryService);
-        this.isPublic = config && config.isPublic;
+        // this.isPublic = config && config.isPublic;
 
-        if (this.isPublic) {
-            this._appInsightsService.CheckIfAppInsightsEnabled().subscribe(isAppinsightsEnabled => {
-                this.isAppInsightsEnabled = isAppinsightsEnabled;
-                this.loadingAppInsightsResource = false;
-            });
-        }
+        // if (this.isPublic) {
+        //     this._appInsightsService.CheckIfAppInsightsEnabled().subscribe(isAppinsightsEnabled => {
+        //         this.isAppInsightsEnabled = isAppinsightsEnabled;
+        //         this.loadingAppInsightsResource = false;
+        //     });
+        // }
     }
 
     @Input()
@@ -110,26 +110,26 @@ export class DetectorListAnalysisComponent extends DataRenderBaseComponent imple
     withinDiagnoseAndSolve: boolean = false;
 
     ngOnInit() {
-        if (this.renderingOnlyMode && this.detectorViewModelsData) {
-          //  this.startRenderingFromInput();
-        }
-        else {
-            if (this.analysisId === "searchResultsAnalysis" && this.searchTerm && this.searchTerm.length > 0) {
-                // Don't refresh genie
-                this.refresh();
-                console.log("calling refresh from nginit", this.searchTerm, this.searchMode);
-            }
-            else {
-                console.log("waiting for update from detector control", this._detectorControl);
-                this._detectorControl.update.subscribe(isValidUpdate => {
-                    if (isValidUpdate) {
-                        this.refresh();
-                        console.log("calling refresh from validupdate", this.searchTerm, this.searchMode);
-                    }
-                });
-            }
+        // if (this.renderingOnlyMode && this.detectorViewModelsData) {
+        //   //  this.startRenderingFromInput();
+        // }
+        // else {
+        //     if (this.analysisId === "searchResultsAnalysis" && this.searchTerm && this.searchTerm.length > 0) {
+        //         // Don't refresh genie
+        //         this.refresh();
+        //         console.log("calling refresh from nginit", this.searchTerm, this.searchMode);
+        //     }
+        //     else {
+        //         console.log("waiting for update from detector control", this._detectorControl);
+        //         this._detectorControl.update.subscribe(isValidUpdate => {
+        //             if (isValidUpdate) {
+        //                 this.refresh();
+        //                 console.log("calling refresh from validupdate", this.searchTerm, this.searchMode);
+        //             }
+        //         });
+        //     }
 
-        }
+        // }
 
         this.startTime = this._detectorControl.startTime;
         this.endTime = this._detectorControl.endTime;
@@ -253,253 +253,253 @@ export class DetectorListAnalysisComponent extends DataRenderBaseComponent imple
     }
 
     refresh() {
-        console.log("calling refresh", this.searchTerm, this.searchMode);
-        if (this.analysisId === "searchResultsAnalysis" && this.searchMode === SearchAnalysisMode.Genie && this.searchTerm && this.searchTerm.length > 1) {
-            this.detectorId = "";
-            this.showAppInsightsSection = false;
-            this.searchId = uuid();
-            console.log("1. starting search task");
-            let searchTask = this._diagnosticService.getDetectorsSearch(this.searchTerm).pipe(map((res) => res), catchError(e => of([])));
-            let detectorsTask = this._diagnosticService.getDetectors().pipe(map((res) => res), catchError(e => of([])));
-            console.log("search task and detectors task", searchTask, detectorsTask);
-            this.showPreLoader = true;
-            observableForkJoin([searchTask, detectorsTask]).subscribe(results => {
-                this.showPreLoader = false;
-                this.showPreLoadingError = false;
-                var searchResults: DetectorMetaData[] = results[0];
-                this.logEvent(TelemetryEventNames.SearchQueryResults, { searchId: this.searchId, query: this.searchTerm, results: JSON.stringify(searchResults.map((det: DetectorMetaData) => new Object({ id: det.id, score: det.score }))), ts: Math.floor((new Date()).getTime() / 1000).toString() });
-                var detectorList = results[1];
-                console.log("search result and detectors result", searchResults, detectorList);
-                if (detectorList) {
-                    searchResults.forEach(result => {
-                        console.log("score:", result.score);
-                        if (result.type === DetectorType.Detector) {
-                            this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
-                        }
-                        else if (result.type === DetectorType.Analysis) {
-                            var childList = this.getChildrenOfAnalysis(result.id, detectorList);
-                            if (childList && childList.length > 0) {
-                                childList.forEach((child: DetectorMetaData) => {
-                                    this.insertInDetectorArray({ name: child.name, id: child.id, score: result.score });
-                                });
-                            }
-                            else {
-                                this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
-                            }
-                        }
-                    });
-                    this.startDetectorRendering(detectorList);
-                    console.log("search result", searchResults, this.detectors);
-                }
-            },
-                (err) => {
-                    this.showPreLoader = false;
-                    this.showPreLoadingError = true;
-                });
-        }
-        else {
-            this._activatedRoute.paramMap.subscribe(params => {
-                this.analysisId = this.analysisId == undefined ? params.get('analysisId') : this.analysisId;
-                this.detectorId = params.get(this.detectorParmName) === null ? "" : params.get(this.detectorParmName);
-                this.resetGlobals();
-                // this.populateSupportTopicDocument();
-                console.log("before check, successfulviewmodels", this.successfulViewModels);
-                if (this.analysisId === "searchResultsAnalysis") {
-                    console.log("Here get analysis Id in searchResultsAnalysis", this.analysisId);
-                    this._activatedRoute.queryParamMap.subscribe(qParams => {
-                        console.log("Here get analysis Id in searchResultsAnalysis trigger search", this.analysisId);
-                        this.resetGlobals();
-                        // this.isSearchAnalysisView = true;
-                        //  this.isSearchAnalysisView = this.searchMode === SearchAnalysisMode.Genie ? false : true;
-                        this.searchTerm = qParams.get('searchTerm') === null ? this.searchTerm : qParams.get('searchTerm');
-                        // this is a workaround to get genie on home page work
-                        //   this.supportDocumentRendered = true;
-                        if (this.searchMode !== SearchAnalysisMode.Genie && !this.supportDocumentRendered) {
-                            this._supportTopicService.getSelfHelpContentDocument().subscribe(res => {
-                                if (res && res.json() && res.json().length > 0) {
-                                    var htmlContent = res.json()[0]["htmlContent"];
-                                    // Custom javascript code to remove top header from support document html string
-                                    var tmp = document.createElement("DIV");
-                                    tmp.innerHTML = htmlContent;
-                                    var h2s = tmp.getElementsByTagName("h2");
-                                    if (h2s && h2s.length > 0) {
-                                        h2s[0].remove();
-                                    }
+        // console.log("calling refresh", this.searchTerm, this.searchMode);
+        // if (this.analysisId === "searchResultsAnalysis" && this.searchMode === SearchAnalysisMode.Genie && this.searchTerm && this.searchTerm.length > 1) {
+        //     this.detectorId = "";
+        //     this.showAppInsightsSection = false;
+        //     this.searchId = uuid();
+        //     console.log("1. starting search task");
+        //     let searchTask = this._diagnosticService.getDetectorsSearch(this.searchTerm).pipe(map((res) => res), catchError(e => of([])));
+        //     let detectorsTask = this._diagnosticService.getDetectors().pipe(map((res) => res), catchError(e => of([])));
+        //     console.log("search task and detectors task", searchTask, detectorsTask);
+        //     this.showPreLoader = true;
+        //     observableForkJoin([searchTask, detectorsTask]).subscribe(results => {
+        //         this.showPreLoader = false;
+        //         this.showPreLoadingError = false;
+        //         var searchResults: DetectorMetaData[] = results[0];
+        //         this.logEvent(TelemetryEventNames.SearchQueryResults, { searchId: this.searchId, query: this.searchTerm, results: JSON.stringify(searchResults.map((det: DetectorMetaData) => new Object({ id: det.id, score: det.score }))), ts: Math.floor((new Date()).getTime() / 1000).toString() });
+        //         var detectorList = results[1];
+        //         console.log("search result and detectors result", searchResults, detectorList);
+        //         if (detectorList) {
+        //             searchResults.forEach(result => {
+        //                 console.log("score:", result.score);
+        //                 if (result.type === DetectorType.Detector) {
+        //                     this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
+        //                 }
+        //                 else if (result.type === DetectorType.Analysis) {
+        //                     var childList = this.getChildrenOfAnalysis(result.id, detectorList);
+        //                     if (childList && childList.length > 0) {
+        //                         childList.forEach((child: DetectorMetaData) => {
+        //                             this.insertInDetectorArray({ name: child.name, id: child.id, score: result.score });
+        //                         });
+        //                     }
+        //                     else {
+        //                         this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
+        //                     }
+        //                 }
+        //             });
+        //             this.startDetectorRendering(detectorList);
+        //             console.log("search result", searchResults, this.detectors);
+        //         }
+        //     },
+        //         (err) => {
+        //             this.showPreLoader = false;
+        //             this.showPreLoadingError = true;
+        //         });
+        // }
+        // else {
+        //     this._activatedRoute.paramMap.subscribe(params => {
+        //         this.analysisId = this.analysisId == undefined ? params.get('analysisId') : this.analysisId;
+        //         this.detectorId = params.get(this.detectorParmName) === null ? "" : params.get(this.detectorParmName);
+        //         this.resetGlobals();
+        //         // this.populateSupportTopicDocument();
+        //         console.log("before check, successfulviewmodels", this.successfulViewModels);
+        //         if (this.analysisId === "searchResultsAnalysis") {
+        //             console.log("Here get analysis Id in searchResultsAnalysis", this.analysisId);
+        //             this._activatedRoute.queryParamMap.subscribe(qParams => {
+        //                 console.log("Here get analysis Id in searchResultsAnalysis trigger search", this.analysisId);
+        //                 this.resetGlobals();
+        //                 // this.isSearchAnalysisView = true;
+        //                 //  this.isSearchAnalysisView = this.searchMode === SearchAnalysisMode.Genie ? false : true;
+        //                 this.searchTerm = qParams.get('searchTerm') === null ? this.searchTerm : qParams.get('searchTerm');
+        //                 // this is a workaround to get genie on home page work
+        //                 //   this.supportDocumentRendered = true;
+        //                 if (this.searchMode !== SearchAnalysisMode.Genie && !this.supportDocumentRendered) {
+        //                     this._supportTopicService.getSelfHelpContentDocument().subscribe(res => {
+        //                         if (res && res.json() && res.json().length > 0) {
+        //                             var htmlContent = res.json()[0]["htmlContent"];
+        //                             // Custom javascript code to remove top header from support document html string
+        //                             var tmp = document.createElement("DIV");
+        //                             tmp.innerHTML = htmlContent;
+        //                             var h2s = tmp.getElementsByTagName("h2");
+        //                             if (h2s && h2s.length > 0) {
+        //                                 h2s[0].remove();
+        //                             }
 
-                                    // Set the innter html for support document display
-                                    this.supportDocumentContent = tmp.innerHTML;
-                                    this.supportDocumentRendered = true;
-                                }
-                            });
-                        }
-                        this.showAppInsightsSection = false;
-                        if (this.searchTerm && this.searchTerm.length > 1) {
-                            this.searchId = uuid();
-                            console.log("1. starting search task");
-                            let searchTask = this._diagnosticService.getDetectorsSearch(this.searchTerm).pipe(map((res) => res), catchError(e => of([])));
-                            let detectorsTask = this._diagnosticService.getDetectors().pipe(map((res) => res), catchError(e => of([])));
-                            console.log("search task and detectors task", searchTask, detectorsTask);
-                            this.showPreLoader = true;
-                            observableForkJoin([searchTask, detectorsTask]).subscribe(results => {
-                                this.showPreLoader = false;
-                                this.showPreLoadingError = false;
-                                var searchResults: DetectorMetaData[] = results[0];
-                                this.logEvent(TelemetryEventNames.SearchQueryResults, { searchId: this.searchId, query: this.searchTerm, results: JSON.stringify(searchResults.map((det: DetectorMetaData) => new Object({ id: det.id, score: det.score }))), ts: Math.floor((new Date()).getTime() / 1000).toString() });
-                                var detectorList = results[1];
-                                console.log("search result and detectors result", searchResults, detectorList);
-                                if (detectorList) {
-                                    searchResults.forEach(result => {
-                                        console.log("score:", result.score);
-                                        if (result.type === DetectorType.Detector) {
-                                            this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
-                                        }
-                                        else if (result.type === DetectorType.Analysis) {
-                                            var childList = this.getChildrenOfAnalysis(result.id, detectorList);
-                                            if (childList && childList.length > 0) {
-                                                childList.forEach((child: DetectorMetaData) => {
-                                                    this.insertInDetectorArray({ name: child.name, id: child.id, score: result.score });
-                                                });
-                                            }
-                                            else {
-                                                this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
-                                            }
-                                        }
-                                    });
-                                    this.startDetectorRendering(detectorList);
-                                    console.log("search result", searchResults, this.detectors);
-                                }
-                            },
-                                (err) => {
-                                    this.showPreLoader = false;
-                                    this.showPreLoadingError = true;
-                                });
-                        }
-                    });
-                }
-                else {
-                    console.log("Here get analysis Id", this.analysisId);
-                    // Add application insights analysis data
-                    this._diagnosticService.getDetector(this.analysisId, this._detectorControl.startTimeString, this._detectorControl.endTimeString)
-                        .subscribe((response: DetectorResponse) => {
-                            this.getApplicationInsightsData(response);
-                        });
+        //                             // Set the innter html for support document display
+        //                             this.supportDocumentContent = tmp.innerHTML;
+        //                             this.supportDocumentRendered = true;
+        //                         }
+        //                     });
+        //                 }
+        //                 this.showAppInsightsSection = false;
+        //                 if (this.searchTerm && this.searchTerm.length > 1) {
+        //                     this.searchId = uuid();
+        //                     console.log("1. starting search task");
+        //                     let searchTask = this._diagnosticService.getDetectorsSearch(this.searchTerm).pipe(map((res) => res), catchError(e => of([])));
+        //                     let detectorsTask = this._diagnosticService.getDetectors().pipe(map((res) => res), catchError(e => of([])));
+        //                     console.log("search task and detectors task", searchTask, detectorsTask);
+        //                     this.showPreLoader = true;
+        //                     observableForkJoin([searchTask, detectorsTask]).subscribe(results => {
+        //                         this.showPreLoader = false;
+        //                         this.showPreLoadingError = false;
+        //                         var searchResults: DetectorMetaData[] = results[0];
+        //                         this.logEvent(TelemetryEventNames.SearchQueryResults, { searchId: this.searchId, query: this.searchTerm, results: JSON.stringify(searchResults.map((det: DetectorMetaData) => new Object({ id: det.id, score: det.score }))), ts: Math.floor((new Date()).getTime() / 1000).toString() });
+        //                         var detectorList = results[1];
+        //                         console.log("search result and detectors result", searchResults, detectorList);
+        //                         if (detectorList) {
+        //                             searchResults.forEach(result => {
+        //                                 console.log("score:", result.score);
+        //                                 if (result.type === DetectorType.Detector) {
+        //                                     this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
+        //                                 }
+        //                                 else if (result.type === DetectorType.Analysis) {
+        //                                     var childList = this.getChildrenOfAnalysis(result.id, detectorList);
+        //                                     if (childList && childList.length > 0) {
+        //                                         childList.forEach((child: DetectorMetaData) => {
+        //                                             this.insertInDetectorArray({ name: child.name, id: child.id, score: result.score });
+        //                                         });
+        //                                     }
+        //                                     else {
+        //                                         this.insertInDetectorArray({ name: result.name, id: result.id, score: result.score });
+        //                                     }
+        //                                 }
+        //                             });
+        //                             this.startDetectorRendering(detectorList);
+        //                             console.log("search result", searchResults, this.detectors);
+        //                         }
+        //                     },
+        //                         (err) => {
+        //                             this.showPreLoader = false;
+        //                             this.showPreLoadingError = true;
+        //                         });
+        //                 }
+        //             });
+        //         }
+        //         else {
+        //             console.log("Here get analysis Id", this.analysisId);
+        //             // Add application insights analysis data
+        //             this._diagnosticService.getDetector(this.analysisId, this._detectorControl.startTimeString, this._detectorControl.endTimeString)
+        //                 .subscribe((response: DetectorResponse) => {
+        //                     this.getApplicationInsightsData(response);
+        //                 });
 
-                    this._diagnosticService.getDetectors().subscribe(detectorList => {
-                        if (detectorList) {
+        //             this._diagnosticService.getDetectors().subscribe(detectorList => {
+        //                 if (detectorList) {
 
-                            if (this.detectorId !== "") {
-                                let currentDetector = detectorList.find(detector => detector.id == this.detectorId)
-                                this.detectorName = currentDetector.name;
-                                return;
-                            } else {
-                                this.detectorEventProperties = {
-                                    'StartTime': String(this._detectorControl.startTime),
-                                    'EndTime': String(this._detectorControl.endTime),
-                                    'DetectorId': this.analysisId,
-                                    'ParentDetectorId': "",
-                                    'Url': window.location.href
-                                };
-                            }
+        //                     if (this.detectorId !== "") {
+        //                         let currentDetector = detectorList.find(detector => detector.id == this.detectorId)
+        //                         this.detectorName = currentDetector.name;
+        //                         return;
+        //                     } else {
+        //                         this.detectorEventProperties = {
+        //                             'StartTime': String(this._detectorControl.startTime),
+        //                             'EndTime': String(this._detectorControl.endTime),
+        //                             'DetectorId': this.analysisId,
+        //                             'ParentDetectorId': "",
+        //                             'Url': window.location.href
+        //                         };
+        //                     }
 
-                            detectorList.forEach(element => {
+        //                     detectorList.forEach(element => {
 
-                                if (element.analysisTypes != null && element.analysisTypes.length > 0) {
-                                    element.analysisTypes.forEach(analysis => {
-                                        if (analysis === this.analysisId) {
-                                            this.detectors.push({ name: element.name, id: element.id });
-                                            this.loadingMessages.push("Checking " + element.name);
-                                        }
-                                    });
-                                }
-                            });
+        //                         if (element.analysisTypes != null && element.analysisTypes.length > 0) {
+        //                             element.analysisTypes.forEach(analysis => {
+        //                                 if (analysis === this.analysisId) {
+        //                                     this.detectors.push({ name: element.name, id: element.id });
+        //                                     this.loadingMessages.push("Checking " + element.name);
+        //                                 }
+        //                             });
+        //                         }
+        //                     });
 
-                            this.startDetectorRendering(detectorList);
-                        }
-                    });
-                }
-            });
-        }
+        //                     this.startDetectorRendering(detectorList);
+        //                 }
+        //             });
+        //         }
+        //     });
+        // }
 
     }
 
-    startDetectorRendering(detectorList) {
-        this.issueDetectedViewModels = [];
-        const requests: Observable<any>[] = [];
+    // startDetectorRendering(detectorList) {
+    //     this.issueDetectedViewModels = [];
+    //     const requests: Observable<any>[] = [];
 
-        this.detectorMetaData = detectorList.filter(detector => this.detectors.findIndex(d => d.id === detector.id) >= 0);
-        console.log("detector meta data", this.detectorMetaData, this.detectors);
-        this.detectorViewModels = this.detectorMetaData.map(detector => this.getDetectorViewModel(detector));
-        if (this.detectorViewModels.length > 0) {
-            this.loadingChildDetectors = true;
-            this.startLoadingMessage();
-        }
-        this.detectorViewModels.forEach((metaData, index) => {
-         //   console.log("detectorViewModels", this.detectorViewModels, metaData, index);
-            requests.push((<Observable<DetectorResponse>>metaData.request).pipe(
-                map((response: DetectorResponse) => {
-                    this.detectorViewModels[index] = this.updateDetectorViewModelSuccess(metaData, response);
+    //     this.detectorMetaData = detectorList.filter(detector => this.detectors.findIndex(d => d.id === detector.id) >= 0);
+    //     console.log("detector meta data", this.detectorMetaData, this.detectors);
+    //     this.detectorViewModels = this.detectorMetaData.map(detector => this.getDetectorViewModel(detector));
+    //     if (this.detectorViewModels.length > 0) {
+    //         this.loadingChildDetectors = true;
+    //         this.startLoadingMessage();
+    //     }
+    //     this.detectorViewModels.forEach((metaData, index) => {
+    //      //   console.log("detectorViewModels", this.detectorViewModels, metaData, index);
+    //         requests.push((<Observable<DetectorResponse>>metaData.request).pipe(
+    //             map((response: DetectorResponse) => {
+    //                 this.detectorViewModels[index] = this.updateDetectorViewModelSuccess(metaData, response);
 
-                    if (this.detectorViewModels[index].loadingStatus !== LoadingStatus.Failed) {
-                        if (this.detectorViewModels[index].status === HealthStatus.Critical || this.detectorViewModels[index].status === HealthStatus.Warning) {
-                            let insight = this.getDetectorInsight(this.detectorViewModels[index]);
-                            let issueDetectedViewModel = { model: this.detectorViewModels[index], insightTitle: insight.title, insightDescription: insight.description };
-                            this.issueDetectedViewModels.push(issueDetectedViewModel);
-                            this.issueDetectedViewModels = this.issueDetectedViewModels.sort((n1, n2) => n1.model.status - n2.model.status);
-                        } else {
-                            let insight = this.getDetectorInsight(this.detectorViewModels[index]);
-                            let successViewModel = { model: this.detectorViewModels[index], insightTitle: insight.title, insightDescription: insight.description };
-                            // if (!this.successfulViewModels.find((viewM) => { viewM.insightTitle === successViewModel.insightTitle })) {
-                            //     console.log("successfulviewmodels push", this.successfulViewModels, successViewModel);
-                            //     this.successfulViewModels.push(successViewModel);
-                            // }
-                            this.successfulViewModels.push(successViewModel);
-                        }
-                    }
+    //                 if (this.detectorViewModels[index].loadingStatus !== LoadingStatus.Failed) {
+    //                     if (this.detectorViewModels[index].status === HealthStatus.Critical || this.detectorViewModels[index].status === HealthStatus.Warning) {
+    //                         let insight = this.getDetectorInsight(this.detectorViewModels[index]);
+    //                         let issueDetectedViewModel = { model: this.detectorViewModels[index], insightTitle: insight.title, insightDescription: insight.description };
+    //                         this.issueDetectedViewModels.push(issueDetectedViewModel);
+    //                         this.issueDetectedViewModels = this.issueDetectedViewModels.sort((n1, n2) => n1.model.status - n2.model.status);
+    //                     } else {
+    //                         let insight = this.getDetectorInsight(this.detectorViewModels[index]);
+    //                         let successViewModel = { model: this.detectorViewModels[index], insightTitle: insight.title, insightDescription: insight.description };
+    //                         // if (!this.successfulViewModels.find((viewM) => { viewM.insightTitle === successViewModel.insightTitle })) {
+    //                         //     console.log("successfulviewmodels push", this.successfulViewModels, successViewModel);
+    //                         //     this.successfulViewModels.push(successViewModel);
+    //                         // }
+    //                         this.successfulViewModels.push(successViewModel);
+    //                     }
+    //                 }
 
-                    return {
-                        'ChildDetectorName': this.detectorViewModels[index].title,
-                        'ChildDetectorId': this.detectorViewModels[index].metadata.id,
-                        'ChildDetectorStatus': this.detectorViewModels[index].status,
-                        'ChildDetectorLoadingStatus': this.detectorViewModels[index].loadingStatus
-                    };
-                })
-                , catchError(err => {
-                    this.detectorViewModels[index].loadingStatus = LoadingStatus.Failed;
-                    return of({});
-                })
-            ));
-        });
+    //                 return {
+    //                     'ChildDetectorName': this.detectorViewModels[index].title,
+    //                     'ChildDetectorId': this.detectorViewModels[index].metadata.id,
+    //                     'ChildDetectorStatus': this.detectorViewModels[index].status,
+    //                     'ChildDetectorLoadingStatus': this.detectorViewModels[index].loadingStatus
+    //                 };
+    //             })
+    //             , catchError(err => {
+    //                 this.detectorViewModels[index].loadingStatus = LoadingStatus.Failed;
+    //                 return of({});
+    //             })
+    //         ));
+    //     });
 
-        // Log all the children detectors
-        observableForkJoin(requests).subscribe(childDetectorData => {
-            setTimeout(() => {
-                let dataOutput = {};
-                dataOutput["status"] = true;
-                dataOutput["data"] = {
-                    'detectors': this.detectors,
-                    'successfulViewModels': this.successfulViewModels,
-                    'issueDetectedViewModels': this.issueDetectedViewModels
-                };
+    //     // Log all the children detectors
+    //     observableForkJoin(requests).subscribe(childDetectorData => {
+    //         setTimeout(() => {
+    //             let dataOutput = {};
+    //             dataOutput["status"] = true;
+    //             dataOutput["data"] = {
+    //                 'detectors': this.detectors,
+    //                 'successfulViewModels': this.successfulViewModels,
+    //                 'issueDetectedViewModels': this.issueDetectedViewModels
+    //             };
 
-                console.log("emitting data 1", dataOutput);
-                this.onComplete.emit(dataOutput);
-            }, 10);
+    //             console.log("emitting data 1", dataOutput);
+    //             this.onComplete.emit(dataOutput);
+    //         }, 10);
 
-            this.childDetectorsEventProperties['ChildDetectorsList'] = JSON.stringify(childDetectorData);
-            this.logEvent(TelemetryEventNames.ChildDetectorsSummary, this.childDetectorsEventProperties);
-        });
+    //         this.childDetectorsEventProperties['ChildDetectorsList'] = JSON.stringify(childDetectorData);
+    //         this.logEvent(TelemetryEventNames.ChildDetectorsSummary, this.childDetectorsEventProperties);
+    //     });
 
-        if (requests.length === 0) {
-            let dataOutput = {};
-            dataOutput["status"] = true;
-            dataOutput["data"] = {
-                'detectors': []
-            };
+    //     if (requests.length === 0) {
+    //         let dataOutput = {};
+    //         dataOutput["status"] = true;
+    //         dataOutput["data"] = {
+    //             'detectors': []
+    //         };
 
-            console.log("emitting data 2", dataOutput);
-            this.onComplete.emit(dataOutput);
-        }
-    }
+    //         console.log("emitting data 2", dataOutput);
+    //         this.onComplete.emit(dataOutput);
+    //     }
+    // }
 
     getChildrenOfAnalysis(analysisId, detectorList) {
         return detectorList.filter(element => (element.analysisTypes != null && element.analysisTypes.length > 0 && element.analysisTypes.findIndex(x => x == analysisId) >= 0)).map(element => { return { name: element.name, id: element.id }; });
@@ -588,63 +588,63 @@ export class DetectorListAnalysisComponent extends DataRenderBaseComponent imple
     }
 
     public selectDetector(viewModel: any) {
-        if (viewModel != null && viewModel.model.metadata.id) {
-            let detectorId = viewModel.model.metadata.id;
-            console.log("viewmodel", viewModel);
-            console.log("viewmodel", viewModel.model.metadata.category);
-            //  let categoryName = encodeURIComponent(viewModel.model.metadata.category);
-            let categoryName = "";
+        // if (viewModel != null && viewModel.model.metadata.id) {
+        //     let detectorId = viewModel.model.metadata.id;
+        //     console.log("viewmodel", viewModel);
+        //     console.log("viewmodel", viewModel.model.metadata.category);
+        //     //  let categoryName = encodeURIComponent(viewModel.model.metadata.category);
+        //     let categoryName = "";
 
-            if (viewModel.model.metadata.category) {
-                categoryName = viewModel.model.metadata.category.replace(/\s/g, '');
-            }
-            else {
-                categoryName = this._router.url.split('/')[11];
-                console.log("uncatgorized category name", categoryName);
-            }
+        //     if (viewModel.model.metadata.category) {
+        //         categoryName = viewModel.model.metadata.category.replace(/\s/g, '');
+        //     }
+        //     else {
+        //         categoryName = this._router.url.split('/')[11];
+        //         console.log("uncatgorized category name", categoryName);
+        //     }
 
-            console.log("after encode", categoryName);
-            if (detectorId !== "") {
+        //     console.log("after encode", categoryName);
+        //     if (detectorId !== "") {
 
-                const clickDetectorEventProperties = {
-                    'ChildDetectorName': viewModel.model.title,
-                    'ChildDetectorId': viewModel.model.metadata.id,
-                    'IsExpanded': true,
-                    'Status': viewModel.model.status
-                };
+        //         const clickDetectorEventProperties = {
+        //             'ChildDetectorName': viewModel.model.title,
+        //             'ChildDetectorId': viewModel.model.metadata.id,
+        //             'IsExpanded': true,
+        //             'Status': viewModel.model.status
+        //         };
 
-                // Log children detectors click
-                this.logEvent(TelemetryEventNames.ChildDetectorClicked, clickDetectorEventProperties);
+        //         // Log children detectors click
+        //         this.logEvent(TelemetryEventNames.ChildDetectorClicked, clickDetectorEventProperties);
 
-                if (this.analysisId === "searchResultsAnalysis" && this.searchTerm && this.searchTerm.length > 0) {
-                    this.logEvent(TelemetryEventNames.SearchResultClicked, { searchId: this.searchId, detectorId: detectorId, rank: 0, title: clickDetectorEventProperties.ChildDetectorName, status: clickDetectorEventProperties.Status, ts: Math.floor((new Date()).getTime() / 1000).toString() });
-                    console.log("detectorlist current router", this._router.url, this.resourceId);
+        //         if (this.analysisId === "searchResultsAnalysis" && this.searchTerm && this.searchTerm.length > 0) {
+        //             this.logEvent(TelemetryEventNames.SearchResultClicked, { searchId: this.searchId, detectorId: detectorId, rank: 0, title: clickDetectorEventProperties.ChildDetectorName, status: clickDetectorEventProperties.Status, ts: Math.floor((new Date()).getTime() / 1000).toString() });
+        //             console.log("detectorlist current router", this._router.url, this.resourceId);
 
-                    let dest1 = `resource${this.resourceId}/categories/${categoryName}/detectors/${detectorId}`;
-                    //     let dest = `../../categories/ConfigurationAndManagement/detectors/${detectorId}`;
-                    //let dest = `../../categories/${categoryName}/detectors/${detectorId}`;
-                    console.log("navigate to", dest1);
+        //             let dest1 = `resource${this.resourceId}/categories/${categoryName}/detectors/${detectorId}`;
+        //             //     let dest = `../../categories/ConfigurationAndManagement/detectors/${detectorId}`;
+        //             //let dest = `../../categories/${categoryName}/detectors/${detectorId}`;
+        //             console.log("navigate to", dest1);
 
-                    // This router is different for genie and case submission flow
-                    //  this._router.navigate([`../analysis/${this.analysisId}/search/detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
-                    // ConfigurationAndManagement
-                    //navigate to ../../categories/ConfigurationandManagement/detectors/swap
-                    this._globals.openGeniePanel = false;
-                    console.log("close panel and openGeniePanel", this._globals);
-                    //this._router.navigateByUrl(`${dest1}`).then(()=>{ console.log("navigated");});
-                    this._router.navigate([dest1]);
-                    //  this.customRedirectTo(dest1);
+        //             // This router is different for genie and case submission flow
+        //             //  this._router.navigate([`../analysis/${this.analysisId}/search/detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
+        //             // ConfigurationAndManagement
+        //             //navigate to ../../categories/ConfigurationandManagement/detectors/swap
+        //             this._globals.openGeniePanel = false;
+        //             console.log("close panel and openGeniePanel", this._globals);
+        //             //this._router.navigateByUrl(`${dest1}`).then(()=>{ console.log("navigated");});
+        //             this._router.navigate([dest1]);
+        //             //  this.customRedirectTo(dest1);
 
-                    //    this._router.navigate([`${dest}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
-                    //   this.navigateTo([`../detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
-                    //  this._activatedRoute.
-                    //  this._router.navigateByUrl(`resource/${resourceId}/legacy/diagnostics/availability/analysis`);
-                }
-                else {
-                    this._router.navigate([`../../analysis/${this.analysisId}/detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true });
-                }
-            }
-        }
+        //             //    this._router.navigate([`${dest}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
+        //             //   this.navigateTo([`../detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true, queryParams: { searchTerm: this.searchTerm } });
+        //             //  this._activatedRoute.
+        //             //  this._router.navigateByUrl(`resource/${resourceId}/legacy/diagnostics/availability/analysis`);
+        //         }
+        //         else {
+        //             this._router.navigate([`../../analysis/${this.analysisId}/detectors/${detectorId}`], { relativeTo: this._activatedRoute, queryParamsHandling: 'merge', preserveFragment: true });
+        //         }
+        //     }
+        // }
     }
 
     customRedirectTo(uri: string) {

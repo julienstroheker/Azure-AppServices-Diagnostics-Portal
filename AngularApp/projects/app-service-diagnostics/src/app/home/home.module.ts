@@ -20,7 +20,6 @@ import { DiagnosticDataModule } from 'diagnostic-data';
 import { GenericAnalysisComponent } from '../shared/components/generic-analysis/generic-analysis.component';
 import { CategorySummaryComponent } from '../fabric-ui/components/category-summary/category-summary.component';
 import { CategoryOverviewComponent } from '../fabric-ui/components/category-overview/category-overview.component';
-import { DetectorCommandBarComponent } from '../fabric-ui/components/detector-command-bar/detector-command-bar.component';
 //import { GeniePanelComponent } from '../fabric-ui/components/genie-panel/genie-panel.component';
 import { DiagnosticsSettingsComponent } from './components/diagnostics-settings/diagnostics-settings.component';
 import { SupportTopicService } from '../shared-v2/services/support-topic.service';

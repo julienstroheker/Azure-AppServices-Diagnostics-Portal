@@ -48,7 +48,7 @@ import { DynamicAnalysisResultsComponent } from './message-flow/dynamic-analysis
     declarations: [
         HomepageComponent,
         SupportBotComponent,
-        // DynamicComponent,
+        DynamicComponent,
         TextMessageComponent,
         LoadingMessageComponent,
         MainMenuComponent,
@@ -85,7 +85,7 @@ import { DynamicAnalysisResultsComponent } from './message-flow/dynamic-analysis
         CategoryMenuComponent,
         DetectorSummaryComponent,
         HealthCheckV3Component,
-        // DynamicComponent,
+        DynamicComponent,
         LoadingMessageComponent
     ],
     providers: [

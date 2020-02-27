@@ -27,10 +27,10 @@ import { ChangeAnalysisOnboardingComponent } from '../changeanalysis-onboarding/
 import { ChangesetsViewComponent } from '../changesets-view/changesets-view.component';
 import { AppDependenciesComponent } from '../app-dependencies/app-dependencies.component';
 import { SummaryCardsComponent } from '../summary-cards/summary-cards.component';
-import { DropdownV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/dropdown-v4/dropdown-v4.component';
-import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
-import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/insights-v4/insights-v4.component';
-import { CardSelectionV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/card-selection-v4/card-selection-v4.component';
+// import { DropdownV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/dropdown-v4/dropdown-v4.component';
+// import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
+// import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/insights-v4/insights-v4.component';
+// import { CardSelectionV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/card-selection-v4/card-selection-v4.component';
 @Component({
   selector: 'dynamic-data',
   templateUrl: './dynamic-data.component.html',
@@ -39,8 +39,8 @@ import { CardSelectionV4Component } from 'projects/app-service-diagnostics/src/a
     TimeSeriesGraphComponent, DataTableComponent, DataSummaryComponent, EmailComponent,
     InsightsComponent, TimeSeriesInstanceGraphComponent, DynamicInsightComponent, MarkdownViewComponent,
     DetectorListComponent, DropdownComponent, CardSelectionComponent, SolutionComponent, GuageControlComponent, FormComponent,
-    ChangeAnalysisOnboardingComponent, ChangesetsViewComponent, AppDependenciesComponent, AppInsightsMarkdownComponent, SummaryCardsComponent, DropdownV4Component, InsightsV4Component,
-    CardSelectionV4Component
+    ChangeAnalysisOnboardingComponent, ChangesetsViewComponent, AppDependenciesComponent, AppInsightsMarkdownComponent, SummaryCardsComponent/*, DropdownV4Component, InsightsV4Component,
+    CardSelectionV4Component*/
   ]
 })
 export class DynamicDataComponent implements OnInit {
@@ -61,10 +61,10 @@ export class DynamicDataComponent implements OnInit {
   @Input() isAnalysisView: boolean = false;
   @ViewChild('dynamicDataContainer', { read: ViewContainerRef, static: true }) dynamicDataContainer: ViewContainerRef;
   private isLegacy: boolean;
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private versionTestService: VersionTestService) { }
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, /*private versionTestService: VersionTestService*/) { }
 
   ngOnInit(): void {
-    this.isLegacy = this.versionTestService.getIsLegcy();
+    this.isLegacy = true; //this.versionTestService.getIsLegcy();
     this.dataBehaviorSubject.subscribe((diagnosticData: DiagnosticData) => {
       const component = this._findInputComponent((<Rendering>diagnosticData.renderingProperties).type);
       const componentFactory = this.componentFactoryResolver.resolveComponentFactory(component);
@@ -96,7 +96,8 @@ export class DynamicDataComponent implements OnInit {
       case RenderingType.Email:
         return EmailComponent;
       case RenderingType.Insights:
-        return this.isLegacy ? InsightsComponent : InsightsV4Component;
+        return InsightsComponent;
+        //return this.isLegacy ? InsightsComponent : InsightsV4Component;
       case RenderingType.TimeSeriesPerInstance:
         return TimeSeriesInstanceGraphComponent;
       case RenderingType.DynamicInsight:
@@ -105,10 +106,10 @@ export class DynamicDataComponent implements OnInit {
         return MarkdownViewComponent;
       case RenderingType.DetectorList:
         return DetectorListComponent;
-      case RenderingType.DropDown:
-        return this.isLegacy ? DropdownComponent : DropdownV4Component;
-      case RenderingType.Cards:
-        return this.isLegacy ? CardSelectionComponent : CardSelectionV4Component;
+      // case RenderingType.DropDown:
+      //   return this.isLegacy ? DropdownComponent : DropdownV4Component;
+      // case RenderingType.Cards:
+      //   return this.isLegacy ? CardSelectionComponent : CardSelectionV4Component;
       case RenderingType.Solution:
         return SolutionComponent;
       case RenderingType.Guage:

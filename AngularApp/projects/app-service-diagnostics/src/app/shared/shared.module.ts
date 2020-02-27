@@ -95,7 +95,7 @@ import { PortalReferrerResolverComponent } from './components/portal-referrer-re
 import { ConfigureStorageAccountComponent } from './components/daas/configure-storage-account/configure-storage-account.component';
 // import { SupportBotModule } from '../supportbot/supportbot.module';
 import { GeniePanelComponent } from '../fabric-ui/components/genie-panel/genie-panel.component';
-import { FabNavModule } from 'diagnostic-data';
+// import { FabNavModule } from 'diagnostic-data';
 import {
     FabBreadcrumbModule,
     FabButtonModule,
@@ -136,7 +136,7 @@ import {
     FabProgressIndicatorModule,
     FabContextualMenuModule
 } from '@angular-react/fabric';
-import { DynamicComponent } from '../supportbot/dynamic-component/dynamic.component';
+//import { DynamicComponent } from '../supportbot/dynamic-component/dynamic.component';
 import { CategorySummaryComponent } from '../fabric-ui/components/category-summary/category-summary.component';
 import { CategoryOverviewComponent } from '../fabric-ui/components/category-overview/category-overview.component';
 import { CategoryNavComponent } from '../home/components/category-nav/category-nav.component';
@@ -148,6 +148,7 @@ import { FabricSearchResultsComponent } from '../fabric-ui/components/fabric-sea
 import { CollapsibleMenuItemComponent } from '../home/components/collapsible-menu-item/collapsible-menu-item.component';
 import { SearchPipe, SearchMatchPipe } from '../home/components/pipes/search.pipe';
 import { DetectorTimePickerComponent } from '../fabric-ui/components/detector-time-picker/detector-time-picker.component';
+import { SupportBotModule } from '../supportbot/supportbot.module';
 
 
 @NgModule({
@@ -215,7 +216,7 @@ import { DetectorTimePickerComponent } from '../fabric-ui/components/detector-ti
         PortalReferrerResolverComponent,
         ConfigureStorageAccountComponent,
         GeniePanelComponent,
-        DynamicComponent,
+        //DynamicComponent,
         CategorySummaryComponent,
         CategoryOverviewComponent,
         CategoryNavComponent,
@@ -230,7 +231,7 @@ import { DetectorTimePickerComponent } from '../fabric-ui/components/detector-ti
         SearchMatchPipe
     ],
     imports: [
-        // SupportBotModule,
+        SupportBotModule,
         HttpClientModule,
         CommonModule,
         StartupModule,
@@ -275,7 +276,6 @@ import { DetectorTimePickerComponent } from '../fabric-ui/components/detector-ti
         FabPeoplePickerModule,
         FabTagPickerModule,
         FabProgressIndicatorModule,
-        FabNavModule,
         FabContextualMenuModule,
     ],
     exports: [
@@ -333,8 +333,8 @@ import { DetectorTimePickerComponent } from '../fabric-ui/components/detector-ti
         GenericCommsComponent,
         GenericAnalysisComponent,
         GeniePanelComponent,
-        DynamicComponent,
-        CategorySummaryComponent,
+        //DynamicComponent,
+        CategorySummaryComponent,        
         CategoryOverviewComponent,
         CategoryNavComponent,
         DetectorCommandBarComponent,

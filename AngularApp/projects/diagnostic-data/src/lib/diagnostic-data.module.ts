@@ -35,7 +35,6 @@ import { DropdownComponent } from './components/dropdown/dropdown.component';
 import { DynamicDataComponent } from './components/dynamic-data/dynamic-data.component';
 import { DynamicInsightComponent } from './components/dynamic-insight/dynamic-insight.component';
 import { EmailComponent } from './components/email/email.component';
-import { FeedbackComponent } from './components/feedback/feedback.component';
 import { InsightsComponent } from './components/insights/insights.component';
 import { LoaderViewComponent } from './components/loader-view/loader-view.component';
 import { MarkdownEditorComponent } from './components/markdown-editor/markdown-editor.component';
@@ -80,22 +79,29 @@ import { DetectorListAnalysisComponent } from './components/detector-list-analys
 import { AppDependenciesComponent } from './components/app-dependencies/app-dependencies.component';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { HighchartsGraphComponent } from './components/highcharts-graph/highcharts-graph.component';
-import { FabNavModule } from './components/fab-nav/fab-nav.module';
+//import { FabNavModule } from './components/fab-nav/fab-nav.module';
 import { FabIconModule, FabChoiceGroupModule, FabSearchBoxModule, FabDropdownModule } from '@angular-react/fabric';
 // import { FabSummaryCardComponent } from './components/fab-summary-card/fab-summary-card.component';
 import { SummaryCardsComponent } from './components/summary-cards/summary-cards.component';
-import { CardSelectionV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/card-selection-v4/card-selection-v4.component';
-import { DropdownV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/dropdown-v4/dropdown-v4.component';
-import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/insights-v4/insights-v4.component';
+import { TextMessageComponent } from 'projects/app-service-diagnostics/src/app/supportbot/common/text-message/text-message.component';
+import { DetectorTimePickerComponent } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/detector-time-picker/detector-time-picker.component';
+import { ButtonMessageComponent } from 'projects/app-service-diagnostics/src/app/supportbot/common/button-message/button-message.component';
+import { FeedbackButtonMessageComponent } from 'projects/app-service-diagnostics/src/app/supportbot/common/feedback-button-message/feedback-button-message.component';
+import { FeedbackComponent as  NewFeedbackComponent} from './components/feedback/feedback.component';
+import { FeedbackComponent } from 'projects/app-service-diagnostics/src/app/supportbot/message-flow/feedback/feedback.component';
+// import { CardSelectionV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/card-selection-v4/card-selection-v4.component';
+// import { DropdownV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/components/dropdown-v4/dropdown-v4.component';
+// import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fabric-ui/insights-v4/insights-v4.component';
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     NvD3Module,
     NgxDatatableModule,
     MarkdownModule.forRoot(),
-    FormsModule,
     MonacoEditorModule.forRoot(),
     CustomMaterialModule,
     HighchartsChartModule,
@@ -125,9 +131,15 @@ import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fa
     AppInsightsMarkdownComponent,
     HighchartsGraphComponent,
     SummaryCardsComponent,
-    CardSelectionV4Component,
-    DropdownV4Component,
-    InsightsV4Component
+    TextMessageComponent,
+    DetectorTimePickerComponent,
+    FeedbackComponent,
+    ButtonMessageComponent,
+    FeedbackButtonMessageComponent,
+    NewFeedbackComponent
+    //CardSelectionV4Component,
+    //DropdownV4Component,
+    //InsightsV4Component
   ],
   exports: [
     FormsModule, TimeSeriesGraphComponent, DataTableComponent, DynamicDataComponent, DetectorViewComponent,
@@ -139,8 +151,9 @@ import { InsightsV4Component } from 'projects/app-service-diagnostics/src/app/fa
     ChangesViewComponent,
     DetectorListAnalysisComponent,
     AppInsightsMarkdownComponent,
-    FabNavModule,
-    FeedbackComponent
+    //FabNavModule,
+    // FeedbackComponent,
+    NewFeedbackComponent
   ],
 })
 export class DiagnosticDataModule {
@@ -152,14 +165,13 @@ export class DiagnosticDataModule {
         GenericSupportTopicService,
         { provide: DIAGNOSTIC_DATA_CONFIG, useValue: config },
         KustoTelemetryService,
-        GenieGlobals,
         AppInsightsTelemetryService,
         TelemetryService,
         DetectorControlService,
         CommsService,
         FeatureNavigationService,
         AppInsightsQueryService,
-        FabNavModule
+        //FabNavModule
       ]
     };
   }

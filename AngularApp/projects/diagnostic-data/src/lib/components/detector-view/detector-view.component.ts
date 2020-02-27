@@ -10,7 +10,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { CompilationProperties} from '../../models/compilation-properties';
 import {GenericSupportTopicService} from '../../services/generic-support-topic.service';
 import { ActivatedRoute, UrlSegment } from '@angular/router';
-import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
+//import { VersionTestService } from 'projects/app-service-diagnostics/src/app/fabric-ui/version-test.service';
 
 @Component({
   selector: 'detector-view',
@@ -82,13 +82,13 @@ export class DetectorViewComponent implements OnInit {
   hideDetectorControl: boolean = false;
   private isLegacy:boolean;
   constructor(@Inject(DIAGNOSTIC_DATA_CONFIG) config: DiagnosticDataConfig, private telemetryService: TelemetryService,
-    private detectorControlService: DetectorControlService, private _supportTopicService: GenericSupportTopicService, protected _route: ActivatedRoute,private versionTestService:VersionTestService) {
+    private detectorControlService: DetectorControlService, private _supportTopicService: GenericSupportTopicService, protected _route: ActivatedRoute) {
     this.isPublic = config && config.isPublic;
     this.feedbackButtonLabel = this.isPublic ? 'Send Feedback' : 'Rate Detector';
   }
 
   ngOnInit() {
-    this.isLegacy = this.versionTestService.getIsLegcy();
+    this.isLegacy = true;//this.versionTestService.getIsLegcy();
     this.loadDetector();
     this.errorSubject.subscribe((data: any) => {
       this.errorState = data;
