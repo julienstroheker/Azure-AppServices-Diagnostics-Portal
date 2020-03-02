@@ -11,7 +11,7 @@ import { Globals } from '../../../globals';
   styleUrls: ['./detector-time-picker.component.scss']
 })
 export class DetectorTimePickerComponent implements OnInit {
-  @Output() updateTimerMessage: EventEmitter<string> = new EventEmitter<string>();
+  @Output() updateTimerMessage: EventEmitter<string> = new EventEmitter<string>(true);
   internalTime: string = "";
   showCalendar: boolean = false;
   showTimePicker: boolean = false;
