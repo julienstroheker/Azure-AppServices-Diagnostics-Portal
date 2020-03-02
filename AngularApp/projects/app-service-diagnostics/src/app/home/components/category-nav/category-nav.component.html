@@ -5,17 +5,30 @@
         <!-- <section-divider [label]="'Overview'" [initiallyExpanded]="false" [collapsible]="false"
           (click)="collapsible = !collapsible">
         </section-divider> -->
-        <section-divider [label]="'Overview'" [isOverview]="true" [initiallySelected]="false" [collapsible]="false" [routePath]="'overview'"
-          (click)="collapsible = !collapsible">
+        <section-divider [label]="'Overview'" [isOverview]="true" [routePath]="'overview'">
           <collapsible-menu-item *ngFor="let detector of detectorList" [menuItem]="detector"
             [class.selected]="isSelected"></collapsible-menu-item>
         </section-divider>
-        <ng-container *ngIf="isDiagnosticTools">
-          <section-divider *ngFor="let item of toolCategoriesFilteredByStack" [label]=item.item.title [routePath]=item.item.title>
-            <collapsible-menu-item *ngFor="let tool of item.item.tools" [menuItem]="tool" [class.selected]="isSelected">
-            </collapsible-menu-item>
-          </section-divider>
-        </ng-container>
+        <section-divider *ngIf="orphanDetectorList.length>0" [label]="'Others'"  [routePath]="'Others'" >
+          <collapsible-menu-item *ngFor="let orphanDetector of orphanDetectorList" [menuItem]="orphanDetector"
+            [class.selected]="isSelected"></collapsible-menu-item>  
+        </section-divider>
+
+        <!-- <section-divider *ngIf="gists.length > 0" [label]="'Gists'" [initiallyExpanded]="false">
+          <i class="fa fa-file-code-o fa-fw menu-icon menu-icon-gists" aria-hidden="true"></i>
+          <collapsible-menu-item *ngFor="let gist of gists" [searchValue]="searchValue" [menuItem]="gist"></collapsible-menu-item>
+          <i *ngIf="!gists || gists.length === 0" class="fa fa-spinner fa-spin fa-3x fa-fw loading-menu"></i>
+        </section-divider>
+ -->
+
+          <ng-container *ngIf="isDiagnosticTools">
+            <section-divider *ngFor="let item of toolCategoriesFilteredByStack" [label]=item.item.title
+              [routePath]=item.item.title>
+              <collapsible-menu-item *ngFor="let tool of item.item.tools" [menuItem]="tool"
+                [class.selected]="isSelected">
+              </collapsible-menu-item>
+            </section-divider>
+          </ng-container>
       </div>
     </div>
   </section>

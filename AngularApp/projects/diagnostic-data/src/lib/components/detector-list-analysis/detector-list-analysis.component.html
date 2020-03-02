@@ -152,32 +152,33 @@
         </div>
       </div>
     </div>
-
-    <!-- <div class="list-item-wrapper" *ngIf="allSolutions.length > 0">
-            <div class="stepper-circle stepper-circle-brown">
-                <i aria-hidden="true" class="fa fa-wrench"></i>
+    <ng-container *ngIf="!withinGenie">
+      <div class="list-item-wrapper" *ngIf="allSolutions.length > 0">
+        <div class="stepper-circle stepper-circle-brown">
+          <i aria-hidden="true" class="fa fa-wrench"></i>
+        </div>
+        <div class="list-item">
+          <div class="list-title">Troubleshooting and Next Steps</div>
+          <div>Next steps curated specifically for your app</div>
+          <div class="list-text">
+            <div *ngIf="allSolutions.length === 0 && getPendingDetectorCount() === 0">
+              <div class="success-msg">We could not identify any futher troubleshooting steps or solutions
+              </div>
             </div>
-            <div class="list-item">
-                <div class="list-title">Troubleshooting and Next Steps</div>
-                <div>Next steps curated specifically for your app</div>
-                <div class="list-text">
-                    <div *ngIf="allSolutions.length === 0 && getPendingDetectorCount() === 0">
-                        <div class="success-msg">We could not identify any futher troubleshooting steps or solutions
-                        </div>
-                    </div>
-                    <div class="analysis-content">
-                        <div *ngIf="getPendingDetectorCount() === 0 && allSolutions.length > 0">
-                            <solutions [solutions]="allSolutions">
-                            </solutions>
-                        </div>
-                        <div *ngIf="getPendingDetectorCount() > 0">
-                            <i class="fa fa-circle-o-notch fa-spin spin-icon" aria-hidden="true"></i>
-                            <span style="margin-left:5px">Loading...</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="analysis-content">
+              <div *ngIf="getPendingDetectorCount() === 0 && allSolutions.length > 0">
+                <solutions [solutions]="allSolutions">
+                </solutions>
+              </div>
+              <div *ngIf="getPendingDetectorCount() > 0">
+                <i class="fa fa-circle-o-notch fa-spin spin-icon" aria-hidden="true"></i>
+                <span style="margin-left:5px">Loading...</span>
+              </div>
             </div>
-        </div> -->
+          </div>
+        </div>
+      </div>
+    </ng-container>
     <div class="list-item-wrapper" *ngIf="successfulViewModels.length > 0">
       <div class="stepper-circle stepper-circle-green">
         <i aria-hidden="true" class="fa fa-check"></i>

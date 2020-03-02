@@ -22,6 +22,7 @@ export class GenericAnalysisComponent extends GenericDetectorComponent implement
   @Input() showSearchBar: boolean = undefined;
   @Output() onComplete = new EventEmitter<any>();
 
+  SearchAnalysisMode = SearchAnalysisMode;
   displayDetectorContainer: boolean = true;
   searchBarFocus: boolean = false;
 

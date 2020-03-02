@@ -21,6 +21,7 @@ export class SectionDividerComponent implements OnInit {
   @Input() collapsible: boolean = true;
   @Input() disableExpandIcon: boolean = false;
   @Input() routePath: string="";
+  @Input() initiallyExpanded: boolean = true;
   expanded: boolean = true;
   overviewImagePath:string = "../../../../assets/img/detectors/Overview.svg";
   selected: boolean = true;
@@ -29,6 +30,7 @@ export class SectionDividerComponent implements OnInit {
 
   ngOnInit() {
     this.selected = this.initiallySelected;
+    this.expanded = this.initiallyExpanded;
   }
 
   isSelected() {
