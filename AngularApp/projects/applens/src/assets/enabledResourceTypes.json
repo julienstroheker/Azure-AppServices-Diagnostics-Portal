@@ -65,7 +65,7 @@
             "imgSrc": "assets/img/Azure-Red-Hat-OpenShift-Logo.png",
             "versionPrefix": "",
             "azureCommImpactedServicesList": "openShiftClusters",
-            "pesId": "",
+            "pesId": "16734",
             "staticSelfHelpContent": "",
             "searchSuffix": "AZURE RED HAT OPENSHIFT CLUSTER"
         },
